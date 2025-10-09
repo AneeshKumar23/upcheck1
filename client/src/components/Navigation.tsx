@@ -74,7 +74,7 @@ export default function Navigation() {
                   <a href="/about" className="w-full">About</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  Resources
+                  <a href="/resources" className="w-full">Resources</a>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   Products
@@ -180,8 +180,8 @@ export default function Navigation() {
                         exit={{ height: 0, opacity: 0 }}
                         className="ml-4 flex flex-col gap-2 py-2"
                       >
-                        <a href="#" className="py-2 text-sm text-muted-foreground">About</a>
-                        <a href="#" className="py-2 text-sm text-muted-foreground">Resources</a>
+                        <a href="/about" className="py-2 text-sm text-muted-foreground">About</a>
+                        <a href="/resources" className="py-2 text-sm text-muted-foreground">Resources</a>
                         <a href="#" className="py-2 text-sm text-muted-foreground">Products</a>
                       </motion.div>
                     )}
