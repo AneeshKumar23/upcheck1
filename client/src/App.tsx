@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Resources from "@/pages/resources";
+import Article from "@/pages/article";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -15,6 +16,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/resources" component={Resources} />
+      <Route path="/resources/:id" component={Article} />
       <Route component={NotFound} />
     </Switch>
   );

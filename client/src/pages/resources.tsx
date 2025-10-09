@@ -225,15 +225,17 @@ export default function Resources() {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-primary hover:text-primary"
-                      style={{
-                        color: "#00C9E4"
-                      }}
-                    >
-                      Read More →
-                    </Button>
+                    <a href={`/resources/${article.id}`} className="w-full">
+                      <Button 
+                        variant="ghost" 
+                        className="w-full text-primary hover:text-primary"
+                        style={{
+                          color: "#00C9E4"
+                        }}
+                      >
+                        Read More →
+                      </Button>
+                    </a>
                   </CardFooter>
                 </Card>
               </motion.div>
