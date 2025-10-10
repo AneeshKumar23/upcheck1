@@ -32,7 +32,7 @@ interface Article {
 const articles: Article[] = postsData.map((post) => ({
   id: post.id,
   title: post.translations.en.title,
-  description: post.translations.en.description,
+  description: post.translations.en.content,
   category: post.categories[0] || "General",
   image: post.thumbnail, // Use the thumbnail from posts.json
   author: post.author,
