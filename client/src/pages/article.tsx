@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -18,9 +19,6 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Import posts from posts.json
-import postsData from "./posts.json";
-
 // Define article type
 interface ArticleData {
   id: number;
@@ -34,24 +32,52 @@ interface ArticleData {
   tags: string[];
 }
 
-// Transform posts data to match the expected format
-const articles: ArticleData[] = postsData.map((post) => ({
-  id: post.id,
-  title: post.translations.en.title,
-  category: post.categories[0] || "General",
-  author: post.author,
-  date: new Date(post.publishedAt).toLocaleDateString(),
-  readTime: "3 min read", // Default read time
-  heroImage: post.thumbnail.replace("w=800", "w=1200"), // Use thumbnail but larger for hero
-  content: post.translations.en.content,
-  tags: post.tags,
-}));
-
 export default function Article() {
   const [, params] = useRoute("/resources/:id");
+  const articleId = params?.id ? parseInt(params.id) : NaN;
   const { toast } = useToast();
-  const articleId = params?.id ? parseInt(params.id) : 1;
-  const article = articles.find((a) => a.id === articleId) || articles[0];
+
+  const [articles, setArticles] = useState<ArticleData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  async function fetchArticle() {
+    try {
+      const res = await fetch(`/api/posts/${articleId || ""}`);
+      const post = await res.json();
+
+      if (!post || post.error) {
+        setArticles([]); // or handle no article found case
+        setLoading(false);
+        return;
+      }
+
+      // Transform directly for single post
+      const transformed = {
+        id: post.id,
+        title: post.translations?.en?.title ?? post.title ?? "",
+        category: post.categories?.[0] ?? "General",
+        author: post.author ?? "Unknown",
+        date: new Date(post.publishedAt).toLocaleDateString(),
+        readTime: "3 min read",
+        heroImage: (post.thumbnail ?? "").replace("w=800", "w=1200"),
+        content: post.translations?.en?.content ?? "",
+        tags: post.tags ?? [],
+      };
+
+      setArticles([transformed]); // store as single-element array for existing logic
+    } catch (error) {
+      console.error("Failed to fetch article:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchArticle();
+}, [articleId]);
+
+  const article =
+    articles.find((a) => a.id === articleId) || (loading ? null : articles[0]);
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -65,7 +91,7 @@ export default function Article() {
     window.open(
       `https://twitter.com/intent/tweet?url=${encodeURIComponent(
         window.location.href
-      )}&text=${encodeURIComponent(article.title)}`,
+      )}&text=${encodeURIComponent(article?.title ?? "")}`,
       "_blank"
     );
   };
@@ -87,6 +113,22 @@ export default function Article() {
       "_blank"
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-site-gradient">
+        <p className="text-white text-xl">Loading article...</p>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-site-gradient">
+        <p className="text-white text-xl">Article not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-site-gradient">
@@ -118,6 +160,10 @@ export default function Article() {
 
       <main className="py-12 px-6">
         <div className="container mx-auto max-w-4xl">
+          {/* The existing article content code remains unchanged*/}
+          {/* Use `article` variable for all content */}
+          {/* ...existing JSX with article props... */}
+          {/* For example: */}
           <motion.article
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -174,9 +220,7 @@ export default function Article() {
                     </h3>
                   ),
                   p: ({ children }) => (
-                    <p className="mb-4 text-foreground leading-relaxed">
-                      {children}
-                    </p>
+                    <p className="mb-4 text-foreground leading-relaxed">{children}</p>
                   ),
                   ul: ({ children }) => (
                     <ul className="list-disc list-inside mb-4 text-foreground space-y-2">
@@ -188,13 +232,9 @@ export default function Article() {
                       {children}
                     </ol>
                   ),
-                  li: ({ children }) => (
-                    <li className="text-foreground">{children}</li>
-                  ),
+                  li: ({ children }) => <li className="text-foreground">{children}</li>,
                   strong: ({ children }) => (
-                    <strong className="font-bold text-foreground">
-                      {children}
-                    </strong>
+                    <strong className="font-bold text-foreground">{children}</strong>
                   ),
                   em: ({ children }) => (
                     <em className="italic text-foreground">{children}</em>

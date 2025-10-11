@@ -136,13 +136,49 @@ export default function Navigation() {
             Join us
           </Button>
 
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.6 9h16.8M3.6 15h16.8" />
-            </svg>
-            <span className="text-sm font-medium">English</span>
-          </div>
+          <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button
+      variant="ghost"
+      className="flex items-center gap-2 text-sm font-medium px-2 py-1"
+    >
+      <svg
+        className="w-5 h-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3.6 9h16.8M3.6 15h16.8"
+        />
+      </svg>
+      <span>English</span>
+      <ChevronDown className="w-4 h-4" />
+    </Button>
+  </DropdownMenuTrigger>
+
+  <DropdownMenuContent
+    align="end"
+    className="w-32 bg-background border border-border/50"
+    style={{ backgroundColor: "white" }}
+  >
+    <DropdownMenuItem>English</DropdownMenuItem>
+    <DropdownMenuItem>தமிழ்</DropdownMenuItem>
+    <DropdownMenuItem>తెలుగు</DropdownMenuItem>
+    <DropdownMenuItem>हिन्दी</DropdownMenuItem>
+    <DropdownMenuItem>বাংলা</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+
 
           <Button 
             variant="ghost" 

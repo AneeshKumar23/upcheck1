@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -13,9 +13,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, Calendar, User } from "lucide-react";
 
-// Import posts from posts.json
-import postsData from "./posts.json";
-
 // Define article type
 interface Article {
   id: number;
@@ -28,30 +25,48 @@ interface Article {
   tags: string[];
 }
 
-// Transform posts data to match the expected format
-const articles: Article[] = postsData.map((post) => ({
-  id: post.id,
-  title: post.translations.en.title,
-  description: post.translations.en.content,
-  category: post.categories[0] || "General",
-  image: post.thumbnail, // Use the thumbnail from posts.json
-  author: post.author,
-  date: new Date(post.publishedAt).toLocaleDateString(),
-  tags: post.tags,
-}));
-
-// Get unique categories from posts data
-const uniqueCategories = Array.from(
-  new Set(postsData.flatMap((post) => post.categories || ["General"]))
-);
-const categories: string[] = ["All", ...uniqueCategories];
-
 export default function Resources() {
+  const [articles, setArticles] = useState<Article[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [postsPerPage] = useState(6);
-  const [currentPage] = useState(1);
+  const [postsPerPage, setPostsPerPage] = useState(3);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Fetch posts from API when component mounts
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const res = await fetch("/api/posts");
+        const postsData = await res.json();
+
+        // Transform the fetched posts to Article[]
+        const transformedArticles: Article[] = postsData.map((post: any) => ({
+          id: post.id,
+          title: post.translations?.en?.title ?? post.title ?? "",
+          description: post.translations?.en?.content ?? post.description ?? "",
+          category: post.categories?.[0] ?? "General",
+          image: post.thumbnail ?? "",
+          author: post.author ?? "Unknown",
+          date: new Date(post.publishedAt).toLocaleDateString(),
+          tags: post.tags ?? [],
+        }));
+
+        setArticles(transformedArticles);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      }
+    }
+
+    fetchPosts();
+  }, []);
+
+  // Get categories dynamically
+  const uniqueCategories = Array.from(
+    new Set(articles.flatMap((article) => article.category || ["General"]))
+  );
+  const categories: string[] = ["All", ...uniqueCategories];
+
+  // Filter articles based on category and search query
   const filteredArticles = articles.filter((article) => {
     const matchesCategory =
       selectedCategory === "All" || article.category === selectedCategory;
@@ -61,12 +76,41 @@ export default function Resources() {
     return matchesCategory && matchesSearch;
   });
 
+  // PAGINATION LOGIC
+  const totalPages = Math.ceil(filteredArticles.length / postsPerPage);
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentArticles = filteredArticles.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) handlePageChange(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) handlePageChange(currentPage - 1);
+  };
+
+  // Reset to first page when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, postsPerPage]);
+
   return (
     <div className="min-h-screen bg-site-gradient">
       <Navigation />
 
       <main className="pt-32 pb-20 px-6">
         <div className="container mx-auto">
+          {/* Title Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -89,12 +133,14 @@ export default function Resources() {
             </p>
           </motion.div>
 
+          {/* Search + Category Filter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mb-8"
           >
+            {/* Search Bar */}
             <div className="relative max-w-xl mx-auto mb-8">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
@@ -106,6 +152,7 @@ export default function Resources() {
               />
             </div>
 
+            {/* Categories */}
             <div className="flex flex-wrap gap-2 justify-center mb-6">
               {categories.map((category) => (
                 <Button
@@ -135,38 +182,70 @@ export default function Resources() {
               ))}
             </div>
 
+            {/* Pagination Controls (Top) */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Posts per page:</span>
-                <select className="border rounded px-2 py-1 bg-background">
-                  <option value="6">{postsPerPage}</option>
+                <select
+                  className="border rounded px-2 py-1 bg-background"
+                  value={postsPerPage}
+                  onChange={(e) => setPostsPerPage(Number(e.target.value))}
+                >
+                  <option value={3}>3</option>
+                  <option value={6}>6</option>
+                  <option value={9}>9</option>
                 </select>
               </div>
+
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-8 h-8 p-0 rounded-full"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
-                    color: "white",
-                    border: "none",
-                  }}
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
                 >
-                  {currentPage}
+                  Prev
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button
+                    key={i}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(i + 1)}
+                    style={
+                      currentPage === i + 1
+                        ? {
+                            background:
+                              "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
+                            border: "none",
+                            color: "white",
+                          }
+                        : {}
+                    }
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
                 </Button>
               </div>
             </div>
           </motion.div>
 
+          {/* Articles Grid */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
           >
-            {filteredArticles.map((article, index) => (
+            {currentArticles.map((article, index) => (
               <motion.div
                 key={article.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -231,24 +310,62 @@ export default function Resources() {
             ))}
           </motion.div>
 
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <span>Posts per page:</span>
-            <select className="border rounded px-2 py-1 bg-background">
-              <option value="6">{postsPerPage}</option>
-            </select>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-8 h-8 p-0 rounded-full ml-4"
-              style={{
-                background: "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
-                color: "white",
-                border: "none",
-              }}
-            >
-              {currentPage}
-            </Button>
-          </div>
+          {/* Pagination Controls (Bottom) */}
+          {filteredArticles.length > postsPerPage && (
+            <div className="flex flex-col items-center justify-center gap-4 mt-8">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Posts per page:</span>
+                <select
+                  className="border rounded px-2 py-1 bg-background"
+                  value={postsPerPage}
+                  onChange={(e) => setPostsPerPage(Number(e.target.value))}
+                >
+                  <option value={3}>3</option>
+                  <option value={6}>6</option>
+                  <option value={9}>9</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Prev
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button
+                    key={i}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageChange(i + 1)}
+                    style={
+                      currentPage === i + 1
+                        ? {
+                            background:
+                              "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
+                            border: "none",
+                            color: "white",
+                          }
+                        : {}
+                    }
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
