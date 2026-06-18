@@ -9,7 +9,11 @@ import About from "@/pages/about";
 import Resources from "@/pages/resources";
 import Article from "@/pages/article";
 import Products from "@/pages/products";
+<<<<<<< HEAD
 import Surveys from "@/pages/surveys";
+=======
+import Polls from "@/pages/polls";
+>>>>>>> 6d074b3 (Completed Polls page implementation)
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,8 +23,13 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/resources" component={Resources} />
       <Route path="/resources/:id" component={Article} />
+<<<<<<< HEAD
       <Route path="/products" component={Products} />
       <Route path="/surveys" component={Surveys} />
+=======
+      <Route path="/products" component={Products} /> 
+      <Route path="/polls" component={Polls} />
+>>>>>>> 6d074b3 (Completed Polls page implementation)
       <Route component={NotFound} />
     </Switch>
   );
