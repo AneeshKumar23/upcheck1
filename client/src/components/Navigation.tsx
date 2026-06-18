@@ -238,13 +238,8 @@ export default function Navigation() {
                         exit={{ height: 0, opacity: 0 }}
                         className="ml-4 flex flex-col gap-2 py-2"
                       >
-<<<<<<< HEAD
                         <a href="/surveys" className="py-2 text-sm text-muted-foreground">Surveys</a>
-                        <a href="#" className="py-2 text-sm text-muted-foreground">Polls</a>
-=======
-                        <a href="#" className="py-2 text-sm text-muted-foreground">Surveys</a>
                         <a href="/polls" className="py-2 text-sm text-muted-foreground">Polls</a>
->>>>>>> 6d074b3 (Completed Polls page implementation)
                         <a href="#" className="py-2 text-sm text-muted-foreground">Feedback</a>
                         <a href="#" className="py-2 text-sm text-muted-foreground">Events</a>
                       </motion.div>
