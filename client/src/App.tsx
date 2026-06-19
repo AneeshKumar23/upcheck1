@@ -10,6 +10,7 @@ import Resources from "@/pages/resources";
 import Article from "@/pages/article";
 import Products from "@/pages/products";
 import NotFound from "@/pages/not-found";
+import Feedback from "@/pages/feedback";
 
 function Router() {
   return (
@@ -19,6 +20,8 @@ function Router() {
       <Route path="/resources" component={Resources} />
       <Route path="/resources/:id" component={Article} />
       <Route path="/products" component={Products} /> 
+      <Route path="/feedback" component={Feedback} />
+     
       <Route component={NotFound} />
     </Switch>
   );
