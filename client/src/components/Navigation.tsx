@@ -30,8 +30,13 @@ export default function Navigation() {
     ["blur(0px)", "blur(12px)"]
   );
 
+  // Prominent Branding: Logo scales from 75px to 60px on scroll (0.8 scale factor)
   const logoScale = useTransform(scrollY, [0, 100], [1, 0.8]);
-  const headerPadding = useTransform(scrollY, [0, 100], ["1.5rem", "1rem"]);
+  
+  // Header height animated from 110px to 80px:
+  // Unscrolled: 17.5px padding + 75px logo + 17.5px padding = 110px
+  // Scrolled: 10px padding + 60px logo + 10px padding = 80px
+  const headerPadding = useTransform(scrollY, [0, 100], ["17.5px", "10px"]);
 
   return (
     <motion.header
@@ -46,11 +51,18 @@ export default function Navigation() {
       data-testid="header-navigation"
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <motion.div style={{ scale: logoScale }} className="flex items-center gap-3">
-          <img src={logoUrl} alt="Upcheck" className="h-8 w-auto" data-testid="img-nav-logo" />
+        {/* Left aligned logo container with fixed width on desktop to guarantee perfect centering */}
+        <motion.div style={{ scale: logoScale }} className="flex items-center gap-3 md:w-64">
+          <img 
+            src={logoUrl} 
+            alt="Upcheck" 
+            className="h-[52px] md:h-[75px] w-auto transition-all duration-300 object-contain" 
+            data-testid="img-nav-logo" 
+          />
         </motion.div>
 
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Centered navigation menu */}
+        <nav className="hidden md:flex items-center justify-center gap-6 flex-1">
           <div 
             className="relative"
             onMouseEnter={exploreHover.onMouseEnter}
@@ -58,7 +70,10 @@ export default function Navigation() {
           >
             <DropdownMenu open={exploreHover.isOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 px-3 py-2">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium hover:text-primary transition-colors duration-200"
+                >
                   Explore
                   <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -90,7 +105,10 @@ export default function Navigation() {
           >
             <DropdownMenu open={participateHover.isOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 px-3 py-2">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium hover:text-primary transition-colors duration-200"
+                >
                   Participate
                   <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -118,18 +136,22 @@ export default function Navigation() {
             </DropdownMenu>
           </div>
 
-          <a href="#contact" className="text-sm font-medium hover-elevate px-3 py-2 rounded-md">
+          <a 
+            href="#contact" 
+            className="text-sm font-medium hover:text-primary transition-colors duration-200 hover-elevate px-3 py-2 rounded-md"
+          >
             Contact
           </a>
         </nav>
 
-        <div className="flex items-center gap-4">
+        {/* Right aligned actions container */}
+        <div className="flex items-center gap-4 md:w-64 justify-end">
           <Button 
             variant="default" 
-            className="hidden md:inline-flex relative overflow-hidden" 
+            className="hidden md:inline-flex relative overflow-hidden font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-md shadow-[#00C9E4]/20 hover:shadow-lg hover:shadow-[#00C9E4]/30 rounded-full px-6 py-2" 
             data-testid="button-join"
             style={{
-              background: "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
+              background: "linear-gradient(90deg, #00D8F6 0%, #0056C6 100%)",
               border: "none"
             }}
           >
@@ -249,9 +271,9 @@ export default function Navigation() {
                   <a href="#contact" className="py-2 text-sm font-medium">Contact</a>
                   
                   <Button 
-                    className="mt-2"
+                    className="mt-2 font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-md shadow-[#00C9E4]/20 rounded-full py-2.5"
                     style={{
-                      background: "linear-gradient(90deg, #00C9E4 0%, #0067B1 100%)",
+                      background: "linear-gradient(90deg, #00D8F6 0%, #0056C6 100%)",
                       border: "none"
                     }}
                   >

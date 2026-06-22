@@ -22,17 +22,16 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
-        {/* Logo Animation */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 3 }}
+          initial={{ opacity: 0, y: 15, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex justify-center mb-8"
         >
           <img 
             src={logoUrl} 
             alt="Upcheck Logo" 
-            className="h-32 md:h-20 "
+            className="h-16 md:h-20 w-auto object-contain"
             data-testid="img-logo"
           />
         </motion.div>
